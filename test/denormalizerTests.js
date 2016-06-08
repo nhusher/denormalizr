@@ -1,7 +1,7 @@
 /*globals describe:false, it: false */
 
 import assert from "assert";
-import denormalize from '../src/denormalize';
+import denormalize from '../src/main';
 import * as schemas from './_schema';
 import { arrayOf } from 'normalizr';
 

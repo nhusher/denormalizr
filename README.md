@@ -106,7 +106,7 @@ contains just the entity's identifier and a symbol indicating that it is an unre
 
 You can check for this value using the `isResolved` functon provided by the library:
 
-```
+```js
 import { denormalize, isResolved } from 'boston';
 
 const empty = denormalize(article, {}, 1); // { id: 1, @resolved: false }
@@ -117,7 +117,8 @@ Where `@resolved` represents a non-enumerable symbol indicating that the object 
 isResolved will return true for any value that does not have the `@resolved` symbol affixed to it.
 
 A more complex example:
-```
+
+```js
 const entities = {
   articles {
     3: {
@@ -133,7 +134,7 @@ const article = denormalize(article, entities, 3);
 
 `article` now contains the value:
 
-```
+```ls
 {
   id: 3,
   title: 'A final article',

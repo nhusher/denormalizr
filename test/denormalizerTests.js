@@ -1,131 +1,164 @@
 /*globals describe:false, it: false */
 
 import assert from "assert";
-import denormalize from '../src/main';
-import * as schemas from './_schema';
-import { arrayOf } from 'normalizr';
+import { denormalize, isResolved, resolved } from '../src/denormalizer';
+import { arrayOf, unionOf, Schema } from 'normalizr';
+
+const reify = o => Object.assign({}, o);
 
 describe('Denormalizer', () => {
-  const STATE = {
-    accounts : {
-      9999: {
-        name : "Car Dealership",
-        users: [3333]
-      }
-    },
-    audiences: {
-      1234: {
-        name   : 'Burlington Audience',
-        product: 4567,
-        size   : 10000,
-        states: [ 1 ]
-      },
-      3456: {
-        name   : 'Virginia Audience',
-        product: 9999,
-        size   : 100,
-        counts : {
-          leads   : 30,
-          invested: 4
-        },
-        states : [1, 2]
-      }
-    },
-    states   : {
+  const schema = {
+    human: new Schema('humans', { idAttribute: 'employeeId' }),
+    robot: new Schema('robots', { idAttribute: 'designation' }),
+    company: new Schema('companies', { idAttribute: 'employerId' }),
+    planet: new Schema('planets')
+  };
+
+  schema.company.define({
+    members: arrayOf(unionOf({
+      robot: schema.robot,
+      human: schema.human
+    }, {
+      schemaAttribute: 'type'
+    })),
+    location: schema.planet
+  });
+
+  const state = {
+    humans: {
       1: {
-        name: 'building',
-        date: 5432
+        employeeId: 1,
+        name: 'Phillip Fry',
+        type: 'human'
+      },
+      3: {
+        employeeId: 3,
+        name: 'Zapp Brannigan',
+        type: 'human'
+      }
+    },
+    robots: {
+      1: {
+        designation: 1,
+        name: 'Bender',
+        type: 'robot'
+      }
+    },
+    companies: {
+      1: {
+        employerId: 1,
+        name: 'Planet Express',
+        location: 'earth',
+        members: [
+          { id: 1, schema: 'human' },
+          { id: 1, schema: 'robot' },
+          { id: 2, schema: 'human' }
+        ]
       },
       2: {
-        name: 'build_requested',
-        date: 4321
+        employerId: 2,
+        name: 'Mom\'s Friendly Robot Factory',
+        location: 'earth'
       }
     },
-    products : {
-      4567: {name: "Solar", account: 8910, icon: "solar.svg"},
-      9999: {name: "Cars", account: 9999, icon: "cars.svg"}
-    },
-    users    : {
-      3333: {name: "Nick"},
-      4444: {name: "Derek"},
-      5555: {name: "Tristan"}
+    planets: {
+      'earth': {
+        id: 'earth',
+        name: "Earth"
+      }
     }
   };
 
   it('should get an entity given an id, schema, app state', () => {
-    let entity = denormalize(STATE, schemas.product, 4567);
-    assert.deepEqual(Object.assign({}, entity), Object.assign({}, STATE.products[4567], { account: { id: 8910 } }));
+    let entity = denormalize(schema.human, state, 1);
+    assert.deepEqual(entity, state.humans[1]);
   });
 
-  it('should return null if the entity is not found', () => {
-    let entity = denormalize(STATE, schemas.product, 1234);
-    assert.equal(entity, null);
+  it('should return an unresoled entity if the entity is not found', () => {
+    let entity = denormalize(schema.human, state, 2);
+    assert.deepEqual(entity, { employeeId: 2, [resolved]: false });
+    assert.equal(isResolved(entity), false);
   });
 
-  it('should return the entity for normalized fields that do exist', () => {
-    let entity = denormalize(STATE, schemas.audience, 1234);
+  it('should transparently denormalize', () => {
+    let entity = denormalize(schema.company, state, 1);
+
     assert.deepEqual(
-        Object.assign({}, entity),
-        Object.assign({}, STATE.audiences[1234], {
-          product: Object.assign({}, STATE.products[4567], {account: {id: 8910}}),
-          states: [ STATE.states[1] ]
-        }));
+      reify(entity),
+      {
+        employerId: 1,
+        name: 'Planet Express',
+        location: {
+          id: 'earth',
+          name: 'Earth'
+        },
+        members: [
+          { employeeId: 1, name: 'Phillip Fry', type: 'human' },
+          { designation: 1, name: 'Bender', type: 'robot' },
+          { employeeId: 2, [resolved]: false }
+        ]
+      });
   });
-
-  it('should let you pull all of an entity type', () => {
-    let entities = denormalize(STATE, arrayOf(schemas.user));
-
-    assert.deepEqual(entities, [{
-      name: "Nick"
-    }, {
-      name: "Derek"
-    }, {
-      name: "Tristan"
-    }]);
-  });
-
 
   it('should let denormalize a list of entities', () => {
-    let entities = denormalize(STATE, arrayOf(schemas.user), [3333,4444]);
+    let entities = denormalize(arrayOf(schema.human), state, [1,3]);
 
     assert.deepEqual(entities, [{
-      name: "Nick"
+      employeeId: 1,
+        name: 'Phillip Fry',
+        type: 'human'
     }, {
-      name: "Derek"
+      employeeId: 3,
+        name: 'Zapp Brannigan',
+        type: 'human'
     }]);
+  });
+
+  it('should allow empty fields', () => {
+    let moms = denormalize(schema.company, state, 2);
+    // should not throw
+    assert.deepEqual(reify(moms), {
+      employerId: 2,
+      name: 'Mom\'s Friendly Robot Factory',
+      location: {
+        id: 'earth',
+        name: 'Earth'
+      }
+    });
   });
 
   it('should cache denormalization of the same entity', () => {
-    let audiences = denormalize(STATE, arrayOf(schemas.audience));
-
-    assert.strictEqual(audiences[0].states[0], audiences[1].states[0]);
+    let companies = denormalize(arrayOf(schema.company), state, [1,2]);
+    assert.strictEqual(companies[0].location, companies[1].location);
   });
 
   it('should allow different calls to share a cache', () => {
     let cache = {};
 
-    let users = denormalize(STATE, arrayOf(schemas.user), [3333], cache),
-        account = denormalize(STATE, schemas.account, 9999, cache);
+    let fry = denormalize(schema.human, state, 1, cache),
+        planetExpress = denormalize(schema.company, state, 1, cache);
 
-    assert.strictEqual(users[0], account.users[0]);
+    assert.strictEqual(fry, planetExpress.members[0]);
   });
 
   it('should have an option to turn off caching', () => {
-    let audiences = denormalize(STATE, arrayOf(schemas.audience), null, false); // no cache
-
-    assert.notStrictEqual(audiences[0].states[0], audiences[1].states[0]);
+    let companies = denormalize(arrayOf(schema.company), state, [1,2], false); // no cache
+    assert.notStrictEqual(companies[0].location, companies[1].location);
   });
 
   it('should throw if fields are missing', () => {
     assert.throws(() => {
-      denormalize(STATE, schemas.audience);
+      denormalize(schema.human, state);
     }, 'Argument id is required');
     assert.throws(() => {
-      denormalize(STATE, null, 1234);
+      denormalize(null, state, 1234);
     }, 'Argument schema is required');
     assert.throws(() => {
-      denormalize(null, schemas.audience, 1234);
+      denormalize(schema.human, null, 1234);
     }, 'Argument entities is required');
+    assert.throws(() => {
+      denormalize(schema.human, state, null);
+    }, 'Argument selector is required');
   });
 });
 

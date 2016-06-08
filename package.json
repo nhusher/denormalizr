@@ -1,13 +1,13 @@
 {
   "name": "boston",
   "version": "0.1.0",
-  "description": "State normalization and denormalization for Redux",
-  "main": "dist/bundle.js",
-  "jsnext:main": "src/main.js",
+  "description": "State denormalization for normalizr",
+  "main": "dist/denormalizer.js",
+  "jsnext:main": "src/denormalizer.js",
   "scripts": {
     "test": "mocha --compilers js:babel-register test/**/*Tests.js"
   },
-  "author": "Nicholas Husher <nick@faraday.io>",
+  "author": "Nicholas Husher <nhusher@gmail.com>",
   "license": "MIT",
   "devDependencies": {
     "lodash": "^4.6.1",

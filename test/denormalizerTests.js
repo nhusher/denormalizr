@@ -11,7 +11,8 @@ describe('Denormalizer', () => {
     human: new Schema('humans', { idAttribute: 'employeeId' }),
     robot: new Schema('robots', { idAttribute: 'designation' }),
     company: new Schema('companies', { idAttribute: 'employerId' }),
-    planet: new Schema('planets')
+    planet: new Schema('planets'),
+    spacecraft: new Schema('spacecraft')
   };
 
   schema.company.define({
@@ -22,6 +23,10 @@ describe('Denormalizer', () => {
       schemaAttribute: 'type'
     })),
     location: schema.planet
+  });
+
+  schema.spacecraft.define({
+    locationInfo: { origin: schema.planet }
   });
 
   const state = {
@@ -64,7 +69,15 @@ describe('Denormalizer', () => {
     planets: {
       'earth': {
         id: 'earth',
-        name: "Earth"
+        name: 'Earth'
+      }
+    },
+    spacecraft: {
+      1: {
+        name: 'Planet Express Ship',
+        locationInfo: {
+          origin: 'earth'
+        }
       }
     }
   };
@@ -126,6 +139,12 @@ describe('Denormalizer', () => {
       }
     });
   });
+
+  it('should allow nested schema fields', () => {
+    let planetExpressShip = denormalize(schema.spacecraft, state, 1);
+
+    console.log(planetExpressShip.locationInfo.origin);
+  })
 
   it('should cache denormalization of the same entity', () => {
     let companies = denormalize(arrayOf(schema.company), state, [1,2]);

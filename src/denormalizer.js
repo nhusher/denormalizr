@@ -1,7 +1,3 @@
-import getIn from 'lodash/get';
-import each from 'lodash/each';
-import map from 'lodash/map';
-
 export const resolved = Symbol('@resolved');
 
 // Checks to see if you are failing to pass in any arguments.
@@ -36,6 +32,32 @@ function cacheSet(cache, schema, id, entity) {
   return entity;
 }
 
+function visit(schema, obj, entities, cache) {
+  let clone = Object.assign({}, obj);
+
+  Object.keys(schema).forEach(key => {
+    let nestedSchema = schema[key],
+        property = obj[key];
+
+    if(isSchema(nestedSchema) && property) {
+      delete clone[key];
+      Object.defineProperty(clone, key, {
+        // readonly: true, // true by default
+        enumerable: true,
+        get() {
+          /*eslint no-use-before-define:0 */
+          return denormalize(nestedSchema, entities, property, cache);
+        }
+      });
+    } else if(typeof nestedSchema === 'object' && property) {
+      clone[key] = visit(nestedSchema, property, entities, cache);
+    }
+  });
+
+  return clone;
+};
+
+
 // Denormalize a single entity. Any foreign schema entities will be proxied behind an ES5 getter,
 // so the work of actually resolving them will only be done when necessary. This assumes the
 // entity store is immutable, otherwise you might get some weird values out of foreign references.
@@ -49,27 +71,13 @@ function cacheSet(cache, schema, id, entity) {
 //
 function denormalizeSingleEntity(schema, entities, id, cache) {
   ensure({ entities, schema, id, cache });
+  let key = schema.getKey();
 
   // We've already resolved this entity:
   if(cacheGet(cache, schema, id)) {
     return cacheGet(cache, schema, id);
-  } else if(getIn(entities, [schema.getKey(), id])) {
-    let rawEntity = getIn(entities, [schema.getKey(), id], null),
-        generatedEntity = Object.assign({}, rawEntity);
-
-    each(schema, (nestedSchema, key) => {
-      if(isSchema(nestedSchema) && rawEntity[key]) {
-        delete generatedEntity[key];
-        Object.defineProperty(generatedEntity, key, {
-          // readonly: true, // true by default
-          enumerable: true,
-          get() {
-            /*eslint no-use-before-define:0 */
-            return denormalize(nestedSchema, entities, rawEntity[key], cache);
-          }
-        });
-      }
-    });
+  } else if(entities[key] && entities[key][id]) {
+    let generatedEntity = visit(schema, entities[key][id], entities, cache);
 
     return cacheSet(cache, schema, id, generatedEntity);
   } else {

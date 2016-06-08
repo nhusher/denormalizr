@@ -1,0 +1,32 @@
+{
+  "rules": {
+    "comma-spacing":            0,
+    "eol-last":                 0,
+    "indent":                   0, //: two-space indents
+    "key-spacing":              0, //: but I like tablespacing things!
+    "linebreak-style":          [ 2, "unix" ],   //: unix linebreaks
+    "no-undef":                 2,
+    "no-loop-func":             0,
+    "no-multi-spaces":          0,    //: don't care about table-casing things
+    "no-shadow":                0,    //: allow shadowing of local values
+    "no-trailing-spaces":       0,    //: whitespace? we love it.
+    "no-underscore-dangle":     0,    //: allow _value
+    "no-unused-expressions":    2,     //: disallow unused exprs
+    "no-unused-vars":          [2, {"vars": "local"}],
+    "no-use-before-define":     2,    //: allow using things before they're defined (i.e. hoisting)
+    "quotes":                   0,    //: dgaf what quotes you use
+    "semi":                     [ 2, "always" ], //: require semicolons
+    "space-infix-ops":          0     //: spaces around infix ops are optional
+  },
+  "env": {
+    "es6": true,
+    "browser": true,
+    "node": true
+  },
+  "ecmaFeatures": {
+    "modules": true
+  },
+  "parser": "babel-eslint",
+  "globals": {
+  }
+}

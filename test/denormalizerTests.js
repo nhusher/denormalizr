@@ -74,6 +74,7 @@ describe('Denormalizer', () => {
     },
     spacecraft: {
       1: {
+        id: 1,
         name: 'Planet Express Ship',
         locationInfo: {
           origin: 'earth'
@@ -143,8 +144,20 @@ describe('Denormalizer', () => {
   it('should allow nested schema fields', () => {
     let planetExpressShip = denormalize(schema.spacecraft, state, 1);
 
-    console.log(planetExpressShip.locationInfo.origin);
-  })
+    // Collapse the ES5 getter:
+    planetExpressShip.locationInfo = reify(planetExpressShip.locationInfo);
+
+    assert.deepEqual(planetExpressShip, {
+      id: 1,
+      name: 'Planet Express Ship',
+      locationInfo: {
+        origin: {
+          id: 'earth',
+          name: 'Earth'
+        }
+      }
+    });
+  });
 
   it('should cache denormalization of the same entity', () => {
     let companies = denormalize(arrayOf(schema.company), state, [1,2]);

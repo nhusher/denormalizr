@@ -8,7 +8,10 @@ to normalize, an entity collection, and it will return the denormalized values.
 
 ### Installation
 
-denormalizr has no dependencies and a small codebase.
+It isn't on NPM yet, sorry!
+
+denormalizr has no dependencies and a small codebase. 
+
 
 ### Usage
 

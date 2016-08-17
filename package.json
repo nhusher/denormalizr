@@ -1,5 +1,5 @@
 {
-  "name": "boston",
+  "name": "denormalizr",
   "version": "0.1.0",
   "description": "State denormalization for normalizr",
   "main": "dist/denormalizer.js",

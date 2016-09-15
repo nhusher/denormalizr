@@ -14,7 +14,7 @@ function ensure(o) {
 
 // Ducktype schemas by what they look like, not their constructor fn identity
 function isSchema(s) {
-  return s.getKey || s.getItemSchema;
+  return s && (s.getKey || s.getItemSchema);
 }
 
 // Retrieve a single item from the cache, provided a valid non-collection entity schema

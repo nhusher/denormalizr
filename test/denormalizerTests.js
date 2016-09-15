@@ -1,7 +1,7 @@
 /*globals describe:false, it: false */
 
 import assert from "assert";
-import { denormalize, isResolved, resolved } from '../src/denormalizer';
+import { denormalize, isResolved, resolved } from '../src/denormalizr';
 import { arrayOf, unionOf, Schema } from 'normalizr';
 
 const reify = o => Object.assign({}, o);

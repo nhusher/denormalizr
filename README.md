@@ -101,19 +101,16 @@ denormalize(arrayOf(article), entities, [1,2]);
 Sometimes, an entity will reference another entity that does not exist in the store. Perhaps it
 was removed from the store, perhaps it never existed, or perhaps it's being retrieved from the
 server and hasn't yet arrived. For these faulty references, denormalizr will return an object that
-contains just the entity's identifier and a symbol indicating that it is an unresolved entity.
+contains just the entity's identifier and a key indicating that it is an unresolved entity.
 
 You can check for this value using the `isResolved` functon provided by the library:
 
 ```js
 import { denormalize, isResolved } from 'denormalizr';
 
-const empty = denormalize(article, {}, 1); // { id: 1, @resolved: false }
+const empty = denormalize(article, {}, 1); // { id: 1, __resolved: false }
 isResolved(empty) // false
 ```
-
-Where `@resolved` represents a non-enumerable symbol indicating that the object is not resolved.
-isResolved will return true for any value that does not have the `@resolved` symbol affixed to it.
 
 A more complex example:
 
@@ -139,7 +136,7 @@ const article = denormalize(article, entities, 3);
   title: 'A final article',
   author: {
     id: 6,
-    @resolved: false // non-enumerable symbol
+    __resolved: false
   }
 }
 ```

@@ -1,4 +1,4 @@
-denormalizr: the other half of [normalizr]
+denormalizer: the other half of [normalizr]
 ===
 
 The normalizr library offers excellent features for normalizing deeply-nested data structures
@@ -8,7 +8,9 @@ to normalize, an entity collection, and it will return the denormalized values.
 
 ### Installation
 
-It isn't on NPM yet, sorry!
+```
+npm install --save denormalizer
+```
 
 denormalizr has no dependencies and a small codebase. 
 

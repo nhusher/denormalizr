@@ -1,13 +1,13 @@
 {
-  "name": "denormalizr",
+  "name": "denormalizer",
   "version": "0.1.0",
   "description": "State denormalization for normalizr",
-  "main": "dist/denormalizr.js",
-  "browser": "dist/denormalizr.js",
-  "jsnext:main": "src/denormalizr.js",
+  "main": "dist/denormalizer.js",
+  "browser": "dist/denormalizer.js",
+  "jsnext:main": "src/denormalizer.js",
   "scripts": {
     "test": "mocha --compilers js:babel-register test/*.js",
-    "build": "rollup -f umd -n denormalizr -o dist/denormalizr.js -- ./src/denormalizr.js",
+    "build": "rollup -f umd -n denormalizer -o dist/denormalizer.js -- ./src/denormalizr.js",
     "prepublish": "npm run test && npm run build"
   },
   "author": "Nicholas Husher <nhusher@gmail.com>",

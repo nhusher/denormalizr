@@ -7,7 +7,7 @@
   "jsnext:main": "src/denormalizer.js",
   "scripts": {
     "test": "mocha --compilers js:babel-register test/*.js",
-    "build": "rollup -f umd -n denormalizer -o dist/denormalizer.js -- ./src/denormalizr.js",
+    "build": "rollup -f umd -n denormalizer -o dist/denormalizer.js -- ./src/denormalizer.js",
     "prepublish": "npm run test && npm run build"
   },
   "author": "Nicholas Husher <nhusher@gmail.com>",

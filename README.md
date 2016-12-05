@@ -3,7 +3,7 @@ denormalizer: the other half of [normalizr]
 
 The normalizr library offers excellent features for normalizing deeply-nested data structures
 into a simple entity store. Returning the normalized data to its denormalized shape is not
-as easy, however. denormalizr makes this process transparent: pass in the entity schema that you used
+as easy, however. denormalizer makes this process transparent: pass in the entity schema that you used
 to normalize, an entity collection, and it will return the denormalized values.
 
 ### Installation
@@ -12,7 +12,7 @@ to normalize, an entity collection, and it will return the denormalized values.
 npm install --save denormalizer
 ```
 
-denormalizr has no dependencies and a small codebase. 
+denormalizer has no dependencies and a small codebase. 
 
 
 ### Usage
@@ -74,7 +74,7 @@ article.define({ author: user });
 We can then call denormalize on the collection of entities to retrieve the denormalized value:
 
 ```js
-import { denormalize } from 'denormalizr';
+import { denormalize } from 'denormalizer';
 
 const article = denormalize(article, entities, 1);
 ```
@@ -102,13 +102,13 @@ denormalize(arrayOf(article), entities, [1,2]);
 
 Sometimes, an entity will reference another entity that does not exist in the store. Perhaps it
 was removed from the store, perhaps it never existed, or perhaps it's being retrieved from the
-server and hasn't yet arrived. For these faulty references, denormalizr will return an object that
+server and hasn't yet arrived. For these faulty references, denormalizer will return an object that
 contains just the entity's identifier and a key indicating that it is an unresolved entity.
 
 You can check for this value using the `isResolved` functon provided by the library:
 
 ```js
-import { denormalize, isResolved } from 'denormalizr';
+import { denormalize, isResolved } from 'denormalizer';
 
 const empty = denormalize(article, {}, 1); // { id: 1, __resolved: false }
 isResolved(empty) // false
@@ -146,7 +146,7 @@ const article = denormalize(article, entities, 3);
 
 ### Implementation
 
-To avoid circular reference hell and denormalizing huge entity trees, denormalizr uses ES5 getters
+To avoid circular reference hell and denormalizing huge entity trees, denormalizer uses ES5 getters
 to dereference foreign entities. When you first retrieve a foreign entity value, it is
 denormalized and cached internally so that future references happen quickly. In principle,
 these objects behave just like regular objects, but in practice sometimes this dereferencing

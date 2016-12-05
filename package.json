@@ -11,8 +11,8 @@
   },
   "scripts": {
     "test": "mocha --compilers js:babel-register test/*.js",
-    "build": "rollup -c -f umd -n denormalizer -o dist/denormalizer.js -- ./src/denormalizer.js",
-    "prepublish": "npm run test && npm run build"
+    "build": "rollup -c",
+    "prepublish": "npm test && npm run build"
   },
   "author": "Nicholas Husher <nhusher@gmail.com>",
   "license": "MIT",
@@ -22,11 +22,12 @@
     "babel-preset-es2015-loose": "^8.0.0",
     "babel-preset-es2015-rollup": "^1.2.0",
     "babel-register": "^6.7.2",
+    "babelrc-rollup": "^3.0.0",
     "eslint": "^1.10.3",
     "lodash": "^4.6.1",
     "mocha": "^2.2.1",
     "normalizr": "^2.0.0",
-    "rollup": "^0.35.10",
+    "rollup": "0.36",
     "rollup-plugin-babel": "^2.6.1",
     "uglify-js": "^2.7.3"
   }

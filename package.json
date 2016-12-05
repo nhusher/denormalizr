@@ -1,6 +1,6 @@
 {
   "name": "denormalizer",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "State denormalization for normalizr",
   "main": "dist/denormalizer.js",
   "browser": "dist/denormalizer.js",
